@@ -15,7 +15,7 @@ except:
 genai.configure(api_key=api_key)
 
 # We use the Flash model because it's fast and supports Search tools
-model = genai.GenerativeModel('gemini-2.5-pro')
+model = genai.GenerativeModel('gemini-2.5-flash')
 
 # ---------------------------------------------------------
 # APP UI
@@ -83,4 +83,5 @@ if st.button("Generate Treatment"):
         except Exception as e:
             st.error(f"Error: {e}")
             st.info("Tip: If you get a 404 on tools, make sure you are using 'gemini-1.5-flash' or 'gemini-1.5-pro'.")
+
 
