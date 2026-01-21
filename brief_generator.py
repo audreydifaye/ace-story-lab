@@ -1,48 +1,85 @@
 import streamlit as st
 import google.generativeai as genai
-
-# OLD (Don't use this for cloud):
-# API_KEY = "AIzaSy..."
-
-# NEW (Cloud-Ready):
 import os
-# Try to get the key from Streamlit Secrets
+
+# ---------------------------------------------------------
+# CONFIGURATION
+# ---------------------------------------------------------
+# Try to get key from Secrets (Cloud) or Hardcoded (Local)
 try:
     api_key = st.secrets["GEMINI_API_KEY"]
 except:
-    st.error("No API Key found in Secrets!")
-    st.stop()
+    # ⚠️ REPLACE WITH YOUR NEW KEY FOR LOCAL TESTING
+    api_key = "AIzaSy..." 
 
 genai.configure(api_key=api_key)
 
-st.title("🎥 ACE Story Lab: Director's Brief")
+# We use the Flash model because it's fast and supports Search tools
+model = genai.GenerativeModel('gemini-1.5-flash')
 
-# Input fields for company URL and industry
-company_url = st.text_input("Company URL")
-industry = st.text_input("Industry")
+# ---------------------------------------------------------
+# APP UI
+# ---------------------------------------------------------
+st.set_page_config(page_title="ACE Story Lab", page_icon="🎬", layout="centered")
 
-if st.button("Generate Brief"):
-    if not api_key:
-        st.error("Please enter your Gemini API key in the sidebar.")
-    elif not company_url or not industry:
-        st.error("Please fill in both the Company URL and Industry.")
-    else:
-        # Configure Gemini API
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("models/gemini-2.5-flash")
-        user_prompt = (
-            "Act as a Hollywood Documentary Researcher. "
-            f"I am making a brand film for: {company_url} in the {industry} space. "
-            "Please browse your internal knowledge about this sector and generate:\n\n"
-            "The Logline: (1 sentence summary)\n\n"
-            "The Villain: (What problem are they fighting?)\n\n"
-            "Visual Concepts: (3 specific ideas for cinematic shots)\n\n"
-            'The "Why": (Why does this company matter?)'
-        )
+# Header
+st.title("🎬 ACE Director's Brief")
+st.markdown("*The 'Intelligence Layer' for Documentary Production*")
+st.markdown("---")
 
+# Inputs
+col1, col2 = st.columns(2)
+with col1:
+    url = st.text_input("Target URL", "https://www.heirloomcarbon.com")
+with col2:
+    industry = st.text_input("Industry", "Climate Tech")
+
+# ---------------------------------------------------------
+# THE VIBE CODE LOGIC
+# ---------------------------------------------------------
+if st.button("Generate Treatment"):
+    with st.spinner("🕵️‍♂️  Searching the live web & Designing the film..."):
         try:
-            response = model.generate_content(user_prompt)
-            output = response.text if hasattr(response, "text") else str(response)
-            st.markdown(output)
+            # 1. THE "ACE STORY LAB" PROMPT
+            # This matches your Business Model (Phase 1: Hero Asset & Phase 2: Trailer Offensive)
+            prompt = f"""
+            Act as a Hollywood Documentary Researcher for ACE Story Lab.
+            I am producing a high-end "Brand Documentary" (not a commercial) for: {url} in the {industry} space.
+            
+            MISSION: Find the "Cinematic Truth" behind this company. Do not write marketing copy. Write a film treatment.
+            
+            Step 1: SEARCH the web for this company's recent news, specific technology, and competitors.
+            Step 2: Generate the following "Director's Brief":
+            
+            ## 🎥 PART 1: THE NARRATIVE ARC (Phase 1)
+            * **The Logline:** (1 sentence summary of the film: "Interstellar meets National Geographic.")
+            * **The Villain:** (What SPECIFIC problem are they fighting? e.g., "The Invisible Enemy of CO2" or "The Chaos of Data".)
+            * **The Hero:** (Not the company, but the *Solution/Customer*. How do they triumph?)
+            * **The Stakes:** (What happens if the Villain wins? Make it emotional.)
+            
+            ## 🔭 PART 2: VISUAL CONCEPTS ("The Signature Shots")
+            * **The Macro Shot:** (A tactile, extreme close-up detail of their tech/product. e.g., "Crushing limestone" or "Pixels firing".)
+            * **The Drone Shot:** (A sense of scale and gravity.)
+            * **The Human Moment:** (A specific scene showing the people behind the machine.)
+
+            ## ⚡ PART 3: THE TRAILER OFFENSIVE (Phase 2)
+            * **The 15s Scroll-Stopper:** (A fast-paced hook idea for LinkedIn ads. What is the visual punch?)
+            
+            ## 🕵️‍♂️ PART 4: COMPETITOR INTEL (Live Search)
+            * **The Competitors:** (List 3 major competitors found in search).
+            * **The Gap:** (What is their current boring marketing angle, and how do we beat it with Cinema?)
+            """
+            
+            # 2. GENERATE WITH GOOGLE SEARCH (GROUNDING)
+            # This 'tools' parameter connects it to the live internet
+            response = model.generate_content(
+                prompt,
+                tools='google_search_retrieval'
+            )
+            
+            # 3. DISPLAY OUTPUT
+            st.markdown(response.text)
+            
         except Exception as e:
             st.error(f"Error: {e}")
+            st.info("Tip: If you get a 404 on tools, make sure you are using 'gemini-1.5-flash' or 'gemini-1.5-pro'.")
