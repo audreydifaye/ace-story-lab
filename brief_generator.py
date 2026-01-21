@@ -74,7 +74,7 @@ if st.button("Generate Treatment"):
             # This 'tools' parameter connects it to the live internet
             response = model.generate_content(
                 prompt,
-                tools='google_search_retrieval'
+                tools='google_search'
             )
             
             # 3. DISPLAY OUTPUT
@@ -83,5 +83,6 @@ if st.button("Generate Treatment"):
         except Exception as e:
             st.error(f"Error: {e}")
             st.info("Tip: If you get a 404 on tools, make sure you are using 'gemini-1.5-flash' or 'gemini-1.5-pro'.")
+
 
 
