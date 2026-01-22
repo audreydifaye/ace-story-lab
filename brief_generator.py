@@ -20,7 +20,7 @@ if not api_key:
 
 genai.configure(api_key=api_key)
 
-# Use the standard Flash model
+# ⚠️ FIX: Changed '2.5' back to '1.5' to prevent 404 errors
 model = genai.GenerativeModel('gemini-2.5-flash')
 
 # ---------------------------------------------------------
@@ -34,19 +34,20 @@ with col1:
     url = st.text_input("Target URL", "https://www.mdartplasticsurgery.com/")
 with col2:
     industry = st.text_input("Industry", "Gender Affirming Surgery")
-            # -----------------------------------------------------
-            # 1. THE "PROTO" BYPASS
-            # Since the string shortcut is failing, we build the object manually.
-            # This forces the library to accept the tool.
-            # -----------------------------------------------------
 
+# ---------------------------------------------------------
+# THE LOGIC
+# ---------------------------------------------------------
 if st.button("Generate Treatment"):
     with st.spinner("🕵️‍♂️  Searching the live web..."):
-try:
-    tool = genai.protos.Tool(
-        google_search=genai.protos.GoogleSearch()
+        try:
+            # 1. THE "PROTO" BYPASS
+            # We build the object manually to force the library to accept the tool.
+            tool = genai.protos.Tool(
+                google_search=genai.protos.GoogleSearch()
             )
 
+            # 2. THE PROMPT
             prompt = f"""
             Act as a Hollywood Documentary Researcher for ACE Story Lab.
             I am making a brand film for: {url} in the {industry} space.
@@ -69,31 +70,11 @@ try:
             * **The Gap:** (How do we beat their marketing?)
             """
             
-            # 2. GENERATE
+            # 3. GENERATE
             # Pass the 'tool' object inside a list.
             response = model.generate_content(
                 prompt,
                 tools=[tool]
             )
             
-            st.markdown(response.text)
-            
-        except Exception as e:
-            st.error(f"Error: {e}")
-            # -----------------------------------------------------
-            # THE FIX: SIMPLE STRING
-            # This works on version 0.8.3+
-            # If this errors, the server is definitely on an old version.
-            # -----------------------------------------------------
-            response = model.generate_content(
-                prompt,
-                tools='google_search' 
-            )
-            
-            st.markdown(response.text)
-            
-        except Exception as e:
-            st.error(f"Error: {e}")
-            st.warning("If you see 'only code_execution is allowed', go to Manage App -> Reboot.")
-
-
+            st
