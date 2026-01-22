@@ -34,41 +34,53 @@ with col2:
 # ---------------------------------------------------------
 # THE LOGIC
 # ---------------------------------------------------------
+# ... (Keep your imports and UI setup at the top) ...
+
 if st.button("Generate Treatment"):
     with st.spinner("🕵️‍♂️  Searching the live web & Designing the film..."):
         try:
-            # THE PROMPT (Updated with your new requirements)
+            # 1. DEFINE THE TOOL MANUALLY (The Fix)
+            # This constructs the "Google Search" tool using the low-level library
+            # so we don't trigger the "String Error".
+            search_tool = genai.protos.Tool(
+                google_search_retrieval=genai.protos.GoogleSearchRetrieval(
+                    dynamic_retrieval_config=genai.protos.DynamicRetrievalConfig(
+                        mode=genai.protos.DynamicRetrievalConfig.Mode.MODE_DYNAMIC
+                    )
+                )
+            )
+
+            # 2. THE PROMPT
             prompt = f"""
             Act as a Hollywood Documentary Researcher for ACE Story Lab.
-            I am producing a high-end "Brand Documentary" (not a commercial) for: {url} in the {industry} space.
+            I am producing a high-end "Brand Documentary" for: {url} in the {industry} space.
             
-            MISSION: Find the "Cinematic Truth" behind this company. Do not write marketing copy. Write a film treatment.
+            MISSION: Find the "Cinematic Truth" behind this company.
             
-            Step 1: SEARCH the web for this company's recent news, specific technology, and competitors.
-            Step 2: Generate the following "Director's Brief":
+            Step 1: SEARCH the web for this company's recent news, technology, and competitors.
+            Step 2: Generate the "Director's Brief":
             
-            ## 🎥 PART 1: THE NARRATIVE ARC (Phase 1)
-            * **The Logline:** (1 sentence summary of the film: "Interstellar meets National Geographic.")
-            * **The Conflict:** (What SPECIFIC problem are they fighting? Provide 2-3 options for how to position the issue creatively, empathetically and with brevity, and gravitas. Include analogies if appropriate.)
-            * **The Protagonist:** (Not the company, but the *Solution/Customer*. How do they triumph?)
-            * **The Stakes:** (What happens if the Villain wins? Make it emotional.)
+            ## 🎥 PART 1: THE NARRATIVE ARC
+            * **The Logline:** (1 sentence summary)
+            * **The Conflict:** (What SPECIFIC problem are they fighting? Use analogies.)
+            * **The Protagonist:** (The Customer/Solution. How do they triumph?)
+            * **The Stakes:** (What happens if the Villain wins?)
             
-            ## 🔭 PART 2: VISUAL CONCEPTS ("The Signature Shots")
-            * **Three distinct visual concepts:** (Based on what we've found out about the target audience, develop a fresh visual concept that will highlight and set their business as an outstanding leader in their industry. Consider macro, drone, human shots, product shots, or others if more compelling)
+            ## 🔭 PART 2: VISUAL CONCEPTS
+            * **Signature Shots:** (3 distinct visual concepts: macro, drone, human.)
 
-            ## ⚡ PART 3: The Narrative Hook (Phase 2)
-            * **The 15s Scroll-Stopper:** (A fast-paced hook idea for LinkedIn, Meta, TikTok, YT, or other ads. What is the visual punch? Why would we focus on a platform vs others?)
+            ## ⚡ PART 3: THE HOOK
+            * **The 15s Scroll-Stopper:** (Visual punch for LinkedIn/Ads.)
             
-            ## 🕵️‍♂️ PART 4: COMPETITOR INTEL (Live Search)
+            ## 🕵️‍♂️ PART 4: COMPETITOR INTEL
             * **The Competitors:** (List 3 major competitors found in search).
-            * **The Gap:** (What is their current boring marketing angle, and how do we beat it with Cinema?)
+            * **The Gap:** (How do we beat their marketing?)
             """
             
-            # FIX 2: Use 'google_search_retrieval' instead of 'code_execution'
-            # This forces it to use Google Search, not Python scripts.
+            # 3. GENERATE (Pass the tool object, NOT a string)
             response = model.generate_content(
                 prompt,
-                tools='google_search'
+                tools=[search_tool]
             )
             
             st.markdown(response.text)
