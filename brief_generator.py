@@ -1,10 +1,6 @@
 import streamlit as st
 import google.generativeai as genai
-
-# ---------------------------------------------------------
-# DEBUG: VERSION CHECK
-# ---------------------------------------------------------
-st.sidebar.write(f"Library Version: {genai.__version__}")
+from duckduckgo_search import DDGS  # <--- The new Search Engine
 
 # ---------------------------------------------------------
 # CONFIGURATION
@@ -18,9 +14,22 @@ if not api_key:
     st.stop()
 
 genai.configure(api_key=api_key)
-
-# Use the standard Flash model
 model = genai.GenerativeModel('gemini-1.5-flash')
+
+# ---------------------------------------------------------
+# HELPER: THE SEARCH FUNCTION
+# ---------------------------------------------------------
+def get_intel(query):
+    """Searches the web and returns a clean text summary."""
+    try:
+        # Limit to 5 results to keep it fast and relevant
+        results = DDGS().text(query, max_results=5)
+        intel = ""
+        for r in results:
+            intel += f"- SOURCE: {r['title']}\n  CONTENT: {r['body']}\n\n"
+        return intel
+    except Exception as e:
+        return f"Search Error: {e}"
 
 # ---------------------------------------------------------
 # APP UI
@@ -40,21 +49,21 @@ with col2:
 if st.button("Generate Treatment"):
     with st.spinner("🕵️‍♂️  Searching the live web..."):
         try:
-            # 1. THE "PROTO" BYPASS
-            # We build the object manually to force the library to accept the tool.
-            tool = genai.protos.Tool(
-                google_search=genai.protos.GoogleSearch()
-            )
-
-            # 2. THE PROMPT
+            # 1. SEARCH MANUALLY
+            # We fetch the data first, then feed it to the AI.
+            search_query = f"{url} {industry} competitors news mission"
+            raw_intel = get_intel(search_query)
+            
+            # 2. THE PROMPT (Now includes the intel directly)
             prompt = f"""
             Act as a Hollywood Documentary Researcher for ACE Story Lab.
             I am making a brand film for: {url} in the {industry} space.
             
-            MISSION: Find the "Cinematic Truth" behind this company.
+            HERE IS THE LIVE INTEL I FOUND:
+            {raw_intel}
             
-            Step 1: SEARCH the web for this company's recent news, technology, and competitors.
-            Step 2: Generate the "Director's Brief":
+            MISSION: Use the intel above to find the "Cinematic Truth" behind this company.
+            Generate the "Director's Brief":
             
             ## 🎥 PART 1: THE NARRATIVE ARC
             * **The Logline:** (1 sentence summary)
@@ -65,16 +74,13 @@ if st.button("Generate Treatment"):
             * **Signature Shots:** (3 distinct visual concepts for the director to consider.)
 
             ## 🕵️‍♂️ PART 3: COMPETITOR INTEL
-            * **The Competitors:** (List 3 major competitors found in search).
+            * **The Competitors:** (Identify competitors from the intel or your knowledge).
             * **The Gap:** (How do we beat their marketing?)
             """
             
             # 3. GENERATE
-            # Pass the 'tool' object inside a list.
-            response = model.generate_content(
-                prompt,
-                tools=[tool]
-            )
+            # No 'tools' parameter needed anymore! pure text.
+            response = model.generate_content(prompt)
             
             st.markdown(response.text)
             
