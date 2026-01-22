@@ -53,17 +53,15 @@ if st.button("Generate Treatment"):
             
             ## 🎥 PART 1: THE NARRATIVE ARC (Phase 1)
             * **The Logline:** (1 sentence summary of the film: "Interstellar meets National Geographic.")
-            * **The Villain:** (What SPECIFIC problem are they fighting? e.g., "The Invisible Enemy of CO2" or "The Chaos of Data".)
-            * **The Hero:** (Not the company, but the *Solution/Customer*. How do they triumph?)
+            * **The Conflict:** (What SPECIFIC problem are they fighting? Provide 2-3 options for how to position the issue creatively, empathetically and with brevity, and gravitas. Include analogies if appropriate.)
+            * **The Protagonist:** (Not the company, but the *Solution/Customer*. How do they triumph?)
             * **The Stakes:** (What happens if the Villain wins? Make it emotional.)
             
             ## 🔭 PART 2: VISUAL CONCEPTS ("The Signature Shots")
-            * **The Macro Shot:** (A tactile, extreme close-up detail of their tech/product. e.g., "Crushing limestone" or "Pixels firing".)
-            * **The Drone Shot:** (A sense of scale and gravity.)
-            * **The Human Moment:** (A specific scene showing the people behind the machine.)
+            * **Three distinct visual concepts:** (Based on what we've found out about the target audience, develop a fresh visual concept that will highlight and set their business as an outstanding leader in their industry. Consider macro, drone, human shots, product shots, or others if more compelling)
 
-            ## ⚡ PART 3: THE TRAILER OFFENSIVE (Phase 2)
-            * **The 15s Scroll-Stopper:** (A fast-paced hook idea for LinkedIn ads. What is the visual punch?)
+            ## ⚡ PART 3: The Narrative Hook (Phase 2)
+            * **The 15s Scroll-Stopper:** (A fast-paced hook idea for LinkedIn, Meta, TikTok, YT, or other ads. What is the visual punch? Why would we focus on a platform vs others?)
             
             ## 🕵️‍♂️ PART 4: COMPETITOR INTEL (Live Search)
             * **The Competitors:** (List 3 major competitors found in search).
@@ -83,6 +81,7 @@ if st.button("Generate Treatment"):
         except Exception as e:
             st.error(f"Error: {e}")
             st.info("Tip: If you get a 404 on tools, make sure you are using 'gemini-1.5-flash' or 'gemini-1.5-pro'.")
+
 
 
 
