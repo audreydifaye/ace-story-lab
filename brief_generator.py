@@ -68,11 +68,12 @@ if st.button("Generate Treatment"):
             # This forces it to use Google Search, not Python scripts.
             response = model.generate_content(
                 prompt,
-                tools='google_search_retrieval'
+                tools='google_search'
             )
             
             st.markdown(response.text)
             
         except Exception as e:
             st.error(f"Error: {e}")
+
 
