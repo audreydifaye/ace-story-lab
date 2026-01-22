@@ -14,7 +14,7 @@ except:
 genai.configure(api_key=api_key)
 
 # FIX 1: Use the correct model name (1.5, not 2.5)
-model = genai.GenerativeModel('gemini-2.5-pro')
+model = genai.GenerativeModel('gemini-2.5-flash')
 
 # ---------------------------------------------------------
 # APP UI
@@ -75,3 +75,4 @@ if st.button("Generate Treatment"):
             
         except Exception as e:
             st.error(f"Error: {e}")
+
