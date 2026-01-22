@@ -4,7 +4,6 @@ import google.generativeai as genai
 # ---------------------------------------------------------
 # DEBUG: VERSION CHECK
 # ---------------------------------------------------------
-# This will show us EXACTLY what version is running on the server.
 st.sidebar.write(f"Library Version: {genai.__version__}")
 
 # ---------------------------------------------------------
@@ -20,8 +19,8 @@ if not api_key:
 
 genai.configure(api_key=api_key)
 
-# ⚠️ FIX: Changed '2.5' back to '1.5' to prevent 404 errors
-model = genai.GenerativeModel('gemini-2.5-flash')
+# Use the standard Flash model
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 # ---------------------------------------------------------
 # APP UI
@@ -77,4 +76,7 @@ if st.button("Generate Treatment"):
                 tools=[tool]
             )
             
-            st
+            st.markdown(response.text)
+            
+        except Exception as e:
+            st.error(f"Error: {e}")
