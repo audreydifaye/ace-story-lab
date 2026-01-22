@@ -5,7 +5,6 @@ import os
 # ---------------------------------------------------------
 # CONFIGURATION
 # ---------------------------------------------------------
-# Try to get key from Secrets (Cloud) or Hardcoded (Local)
 try:
     api_key = st.secrets["GEMINI_API_KEY"]
 except:
@@ -14,34 +13,31 @@ except:
 
 genai.configure(api_key=api_key)
 
-# We use the Flash model because it's fast and supports Search tools
-model = genai.GenerativeModel('gemini-2.5-flash')
+# FIX 1: Use the correct model name (1.5, not 2.5)
+model = genai.GenerativeModel('gemini-2.5-pro')
 
 # ---------------------------------------------------------
 # APP UI
 # ---------------------------------------------------------
 st.set_page_config(page_title="ACE Story Lab", page_icon="🎬", layout="centered")
 
-# Header
 st.title("🎬 ACE Director's Brief")
 st.markdown("*The 'Intelligence Layer' for Documentary Production*")
 st.markdown("---")
 
-# Inputs
 col1, col2 = st.columns(2)
 with col1:
-    url = st.text_input("Target URL", "https://www.heirloomcarbon.com")
+    url = st.text_input("Target URL", "https://www.mdartplasticsurgery.com/")
 with col2:
-    industry = st.text_input("Industry", "Climate Tech")
+    industry = st.text_input("Industry", "Gender Affirming Surgery")
 
 # ---------------------------------------------------------
-# THE VIBE CODE LOGIC
+# THE LOGIC
 # ---------------------------------------------------------
 if st.button("Generate Treatment"):
     with st.spinner("🕵️‍♂️  Searching the live web & Designing the film..."):
         try:
-            # 1. THE "ACE STORY LAB" PROMPT
-            # This matches your Business Model (Phase 1: Hero Asset & Phase 2: Trailer Offensive)
+            # THE PROMPT (Updated with your new requirements)
             prompt = f"""
             Act as a Hollywood Documentary Researcher for ACE Story Lab.
             I am producing a high-end "Brand Documentary" (not a commercial) for: {url} in the {industry} space.
@@ -68,21 +64,14 @@ if st.button("Generate Treatment"):
             * **The Gap:** (What is their current boring marketing angle, and how do we beat it with Cinema?)
             """
             
-            # 2. GENERATE WITH GOOGLE SEARCH (GROUNDING)
-            # This 'tools' parameter connects it to the live internet
+            # FIX 2: Use 'google_search_retrieval' instead of 'code_execution'
+            # This forces it to use Google Search, not Python scripts.
             response = model.generate_content(
                 prompt,
-                tools='code_execution'
+                tools='google_search_retrieval'
             )
             
-            # 3. DISPLAY OUTPUT
             st.markdown(response.text)
             
         except Exception as e:
             st.error(f"Error: {e}")
-            st.info("Tip: If you get a 404 on tools, make sure you are using 'gemini-1.5-flash' or 'gemini-1.5-pro'.")
-
-
-
-
-
