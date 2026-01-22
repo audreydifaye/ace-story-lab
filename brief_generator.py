@@ -37,19 +37,49 @@ with col2:
 
 if st.button("Generate Treatment"):
     with st.spinner("🕵️‍♂️  Searching the live web..."):
-        try:
+try:
+            # -----------------------------------------------------
+            # 1. THE "PROTO" BYPASS
+            # Since the string shortcut is failing, we build the object manually.
+            # This forces the library to accept the tool.
+            # -----------------------------------------------------
+            tool = genai.protos.Tool(
+                google_search=genai.protos.GoogleSearch()
+            )
+
             prompt = f"""
-            Act as a Hollywood Documentary Researcher.
-            I am making a film for: {url} in the {industry} space.
+            Act as a Hollywood Documentary Researcher for ACE Story Lab.
+            I am making a brand film for: {url} in the {industry} space.
             
-            Step 1: SEARCH the web for recent news, technology, and competitors.
-            Step 2: Create a Director's Brief with:
-            - Logline
-            - The Villain (Specific Conflict)
-            - Signature Visuals (Drone, Macro, Human)
-            - Competitors & The Gap
+            MISSION: Find the "Cinematic Truth" behind this company.
+            
+            Step 1: SEARCH the web for this company's recent news, technology, and competitors.
+            Step 2: Generate the "Director's Brief":
+            
+            ## 🎥 PART 1: THE NARRATIVE ARC
+            * **The Logline:** (1 sentence summary)
+            * **The Conflict:** (What SPECIFIC problem are they fighting? Use analogies.)
+            * **The Stakes:** (What happens if the conflict doesn't get resolved?)
+            
+            ## 🔭 PART 2: VISUAL CONCEPTS
+            * **Signature Shots:** (3 distinct visual concepts for the director to consider.)
+
+            ## 🕵️‍♂️ PART 3: COMPETITOR INTEL
+            * **The Competitors:** (List 3 major competitors found in search).
+            * **The Gap:** (How do we beat their marketing?)
             """
             
+            # 2. GENERATE
+            # Pass the 'tool' object inside a list.
+            response = model.generate_content(
+                prompt,
+                tools=[tool]
+            )
+            
+            st.markdown(response.text)
+            
+        except Exception as e:
+            st.error(f"Error: {e}")
             # -----------------------------------------------------
             # THE FIX: SIMPLE STRING
             # This works on version 0.8.3+
@@ -65,3 +95,4 @@ if st.button("Generate Treatment"):
         except Exception as e:
             st.error(f"Error: {e}")
             st.warning("If you see 'only code_execution is allowed', go to Manage App -> Reboot.")
+
