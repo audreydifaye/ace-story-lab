@@ -77,15 +77,13 @@ if st.button("Generate Treatment"):
             * **The Gap:** (How do we beat their marketing?)
             """
             
-            # 3. GENERATE (Pass the tool object, NOT a string)
+            # 3. GENERATE WITH GOOGLE SEARCH
+            # We use a dictionary list here. This is the new, clean way to ask for search.
             response = model.generate_content(
                 prompt,
-                tools=[search_tool]
+                tools=[{'google_search': {}}] 
             )
             
             st.markdown(response.text)
-            
-        except Exception as e:
-            st.error(f"Error: {e}")
 
 
