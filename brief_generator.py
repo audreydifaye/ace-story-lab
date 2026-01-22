@@ -34,17 +34,17 @@ with col1:
     url = st.text_input("Target URL", "https://www.mdartplasticsurgery.com/")
 with col2:
     industry = st.text_input("Industry", "Gender Affirming Surgery")
-
-if st.button("Generate Treatment"):
-    with st.spinner("🕵️‍♂️  Searching the live web..."):
-try:
             # -----------------------------------------------------
             # 1. THE "PROTO" BYPASS
             # Since the string shortcut is failing, we build the object manually.
             # This forces the library to accept the tool.
             # -----------------------------------------------------
-            tool = genai.protos.Tool(
-                google_search=genai.protos.GoogleSearch()
+
+if st.button("Generate Treatment"):
+    with st.spinner("🕵️‍♂️  Searching the live web..."):
+try:
+    tool = genai.protos.Tool(
+        google_search=genai.protos.GoogleSearch()
             )
 
             prompt = f"""
@@ -95,4 +95,5 @@ try:
         except Exception as e:
             st.error(f"Error: {e}")
             st.warning("If you see 'only code_execution is allowed', go to Manage App -> Reboot.")
+
 
